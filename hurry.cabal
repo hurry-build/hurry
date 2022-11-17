@@ -73,8 +73,10 @@ library
   hs-source-dirs:  src
 
   -- cabal-fmt: expand src
-  exposed-modules:
-  build-depends:   aeson ==2.1.1.0
+  exposed-modules: Hurry.Cabal
+  build-depends:
+    , cabal-plan            ==0.7.2.3
+    , directory
 
 executable hurry
   import:         lang
@@ -85,8 +87,8 @@ executable hurry
   -- cabal-fmt: expand cmd/hurry -Main
   other-modules:
   build-depends:
+    , aeson                 ==2.1.1.0
+    , cabal-plan            ==0.7.2.3
     , hurry
     , optparse-applicative  ==0.17.0.0
-    , cabal-plan == 0.7.2.3
-    , aeson ==2.1.1.0
     , pretty-simple
