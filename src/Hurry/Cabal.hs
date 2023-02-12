@@ -5,7 +5,7 @@ import Relude
 import Cabal.Plan (UnitId (..), PkgId, dispPkgId)
 import System.Directory (getHomeDirectory)
 
-loadPackageHash :: PkgId -> UnitId -> IO ByteString
+loadPackageHash :: PkgId -> UnitId -> IO (Maybe ByteString)
 loadPackageHash compilerID (UnitId unitID) = do
   home <- getHomeDirectory
   let packageHashLoc = home <> "/.cabal/store/" <> toString (dispPkgId compilerID) <> "/" <> toString unitID <> "/cabal-hash.txt"

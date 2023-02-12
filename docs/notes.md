@@ -102,3 +102,5 @@ can i use `cabal freeze` and parse that ouput for my lockfile?
     - not even `documentation:` etc. configurations - probably relying on those being already in `cabal.project`
 - flags are also in `plan.json`
   - use cabal-hash to get configurations (like `documentation:`)
+
+paths modules: https://cabal.readthedocs.io/en/3.4/cabal-package.html#accessing-data-files-from-package-code
