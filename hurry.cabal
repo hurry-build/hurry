@@ -76,12 +76,15 @@ library
   exposed-modules:
     Hurry.Cabal
     Hurry.Lockfile
+    Hurry.Server
 
   build-depends:
+    , aeson            ==2.1.1.0
     , cabal-plan       ==0.7.2.3
     , directory
     , safe-exceptions  ==0.1.7.3
-    , aeson ==2.1.1.0
+    , servant          ==0.19.1
+    , servant-server   ==0.19.2
 
 executable hurry
   import:         lang
@@ -92,12 +95,11 @@ executable hurry
   -- cabal-fmt: expand cmd/hurry-cli -Main
   other-modules:
   build-depends:
-    , aeson-pretty ==0.8.9
     , aeson                 ==2.1.1.0
+    , aeson-pretty          ==0.8.9
     , cabal-plan            ==0.7.2.3
     , hurry
     , optparse-applicative  ==0.17.0.0
-    , pretty-simple
     , with-utf8             ==1.0.2.3
 
 executable hurry-api
@@ -113,5 +115,6 @@ executable hurry-api
     , cabal-plan            ==0.7.2.3
     , hurry
     , optparse-applicative  ==0.17.0.0
-    , pretty-simple
+    , wai                   ==3.2.3
+    , warp                  ==3.3.23
     , with-utf8             ==1.0.2.3

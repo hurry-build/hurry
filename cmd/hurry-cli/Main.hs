@@ -10,6 +10,7 @@ import Options.Applicative.Extra (execParser, helper)
 import Options.Applicative.Types (Parser, ParserInfo)
 
 import Hurry.Lockfile (createLockfile)
+import qualified Data.Map.Strict as Map
 
 data Subcommand = Lock | Save | Restore | Verify
 
@@ -32,7 +33,7 @@ main = do
   args <- execParser argparser
   case args of
     Lock -> lockCmd
-    Save -> putStrLn "not yet implemented"
+    Save -> saveCmd
     Restore -> putStrLn "Not yet implemented"
     Verify -> putStrLn "Not yet implemented"
 
@@ -40,12 +41,19 @@ lockCmd :: IO ()
 lockCmd = do
   -- Load the Cabal install plan.
   cabalPlanJSON <- eitherDecodeFileStrict @PlanJson "dist-newstyle/cache/plan.json"
-  cabalPlan <- case cabalPlanJSON of
+  cabalPlan@PlanJson{pjUnits} <- case cabalPlanJSON of
     Right p -> pure p
     Left err -> die $ "Could not load dist-newstyle/cache/plan.json: " <> err
 
   -- Create a lockfile.
+  putStrLn $ "Creating lockfile for " <> show (Map.size pjUnits) <> " dependencies..."
   let lockfile = createLockfile cabalPlan
 
   -- Write the lockfile.
   writeFileBS "hurry.lock" $ toStrict $ encodePretty lockfile
+  putStrLn "Wrote lockfile to hurry.lock"
+
+saveCmd :: IO ()
+saveCmd = do
+  -- TODO: Add authentication.
+  undefined
