@@ -1,3 +1,13 @@
+- [ ] `lock` and `restore` working on just this project on one platform
+  - [ ] For now, we can just store using unit IDs - I don't think we need to do anything special here
+    - [ ] Do we need special `Paths_` handling?
+  - [ ] Make restore _only_ work from cache to start, and then later have it do installs
+- [ ] `verify` working on one platform
+- [ ] `restore` working cross-platform
+  - [ ] Will need to parse cabal-hash in order to do cross-platform reinstall/restore (rather than just download from binary cache)
+
+----
+
 - [ ] `cabal install hurry`
 
 - [ ] Actionable error handling
@@ -11,4 +21,3 @@
     - Example: non-relocatable native C libraries
 
 - [ ] `hurry restore`
-

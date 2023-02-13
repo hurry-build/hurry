@@ -73,18 +73,23 @@ library
   hs-source-dirs:  src
 
   -- cabal-fmt: expand src
-  exposed-modules: Hurry.Cabal
+  exposed-modules:
+    Hurry.Cabal
+    Hurry.Lockfile
+
   build-depends:
-    , cabal-plan            ==0.7.2.3
+    , cabal-plan       ==0.7.2.3
     , directory
+    , safe-exceptions  ==0.1.7.3
+    , aeson ==2.1.1.0
 
 executable hurry
   import:         lang
-  hs-source-dirs: cmd/hurry
+  hs-source-dirs: cmd/hurry-cli
   main-is:        Main.hs
   ghc-options:    -threaded
 
-  -- cabal-fmt: expand cmd/hurry -Main
+  -- cabal-fmt: expand cmd/hurry-cli -Main
   other-modules:
   build-depends:
     , aeson                 ==2.1.1.0
@@ -92,3 +97,20 @@ executable hurry
     , hurry
     , optparse-applicative  ==0.17.0.0
     , pretty-simple
+    , with-utf8             ==1.0.2.3
+
+executable hurry-api
+  import:         lang
+  hs-source-dirs: cmd/hurry-api
+  main-is:        Main.hs
+  ghc-options:    -threaded
+
+  -- cabal-fmt: expand cmd/hurry-api -Main
+  other-modules:
+  build-depends:
+    , aeson                 ==2.1.1.0
+    , cabal-plan            ==0.7.2.3
+    , hurry
+    , optparse-applicative  ==0.17.0.0
+    , pretty-simple
+    , with-utf8             ==1.0.2.3
