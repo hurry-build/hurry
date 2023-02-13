@@ -12,11 +12,14 @@ Commands include:
 - `hurry restore` installs dependencies from the `hurry.lock` file.
 - `hurry verify` checks whether the solved dependency installation plan from running `cabal build` conflicts with the project's `hurry.lock`.
 
+
+
 <!--
 
 TODO:
 - `hurry restore` installs dependencies from the `hurry.lock` file, loading them from a shared dependency cache when available.
 - `hurry cache` uploads the project's currently built dependencies to a shared dependency cache.
+- `hurry build` does the right thing, and you can build the deps from just a lockfile (for Docker layer caching)
 
 -->
 ## Installation
@@ -31,5 +34,16 @@ cabal install
 
 TODO:
 Use `cabal install hurry` to install the latest version of Hurry.
+
+-->
+
+
+<!--
+
+TODO: Usage section
+
+- Usage in raw Cabal builds
+- Usage in GitHub Actions and using GHA caching
+- Usage in Docker and Dockerfile and layer cahcing
 
 -->

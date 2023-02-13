@@ -8,6 +8,10 @@
 
 ----
 
+- Later, we should have `hurry build` that implicitly runs `verify`, `lock`, `restore`, and `save` as needed and those specific actions can be moved to subcommands
+
+----
+
 - [ ] `cabal install hurry`
 
 - [ ] Actionable error handling

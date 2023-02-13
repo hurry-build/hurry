@@ -92,6 +92,7 @@ executable hurry
   -- cabal-fmt: expand cmd/hurry-cli -Main
   other-modules:
   build-depends:
+    , aeson-pretty ==0.8.9
     , aeson                 ==2.1.1.0
     , cabal-plan            ==0.7.2.3
     , hurry
