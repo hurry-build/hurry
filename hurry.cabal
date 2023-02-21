@@ -82,6 +82,8 @@ library
     , aeson            ==2.1.1.0
     , cabal-plan       ==0.7.2.3
     , directory
+    , filepath
+    , mtl              ==2.2.2
     , safe-exceptions  ==0.1.7.3
     , servant          ==0.19.1
     , servant-server   ==0.19.2
@@ -98,9 +100,16 @@ executable hurry
     , aeson                 ==2.1.1.0
     , aeson-pretty          ==0.8.9
     , cabal-plan            ==0.7.2.3
+    , directory
+    , filepath
     , hurry
     , optparse-applicative  ==0.17.0.0
+    , req                   ==3.13.0
+    , safe-exceptions       ==0.1.7.3
+    , tar                   ==0.5.1.1
+    , temporary             ==1.3
     , with-utf8             ==1.0.2.3
+    , zstd                  ==0.1.3.0
 
 executable hurry-api
   import:         lang
@@ -116,5 +125,6 @@ executable hurry-api
     , hurry
     , optparse-applicative  ==0.17.0.0
     , wai                   ==3.2.3
+    , wai-logger            ==2.4.0
     , warp                  ==3.3.23
     , with-utf8             ==1.0.2.3

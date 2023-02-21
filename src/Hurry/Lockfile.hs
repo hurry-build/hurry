@@ -1,8 +1,8 @@
-module Hurry.Lockfile (createLockfile) where
+module Hurry.Lockfile (Lockfile (..), createLockfile) where
 
 import Relude
 
-import Cabal.Plan (PlanJson (..), Unit (..), UnitId (..), UnitType (..))
+import Cabal.Plan (PkgId, PlanJson (..), Unit (..), UnitId (..), UnitType (..))
 import Data.Aeson (Encoding, FromJSON, ToJSON (..), defaultOptions, genericToEncoding)
 import Data.Map.Strict qualified as Map
 
@@ -10,8 +10,9 @@ import Data.Map.Strict qualified as Map
 -- always support the current lockfile version and the immediately previous
 -- lockfile version, and support upgrading from the immediately previous version
 -- where possible.
-newtype Lockfile = Lockfile
-  { units :: [Text]
+data Lockfile = Lockfile
+  { units :: [UnitId]
+  , compiler :: PkgId
   }
   deriving stock (Generic)
   deriving anyclass (FromJSON)
@@ -21,15 +22,16 @@ instance ToJSON Lockfile where
   toEncoding = genericToEncoding defaultOptions
 
 createLockfile :: PlanJson -> Lockfile
-createLockfile PlanJson{pjUnits} =
+createLockfile PlanJson{pjUnits, pjCompilerId} =
   Lockfile
     { -- Units are sorted so that installation plans with the same units are
       -- stable.
       units = sort $ mapMaybe (unitToString . snd) (Map.toList pjUnits)
+    , compiler = pjCompilerId
     }
  where
-  unitToString :: Unit -> Maybe Text
-  unitToString Unit{uId = UnitId uId, uType} =
+  unitToString :: Unit -> Maybe UnitId
+  unitToString Unit{uId, uType} =
     -- For the definition of "unit type", see: https://hackage.haskell.org/package/cabal-plan-0.7.2.3/docs/Cabal-Plan.html#t:UnitType
     -- For an explanation of package types, see: https://cabal.readthedocs.io/en/stable/nix-local-build.html#local-versus-external-packages
     case uType of
