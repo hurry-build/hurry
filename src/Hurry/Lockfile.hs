@@ -5,7 +5,6 @@ import Relude
 import Cabal.Plan (CompName (CompNameExe), PkgId, PlanJson (..), Unit (..), UnitId (..), UnitType (..))
 import Data.Aeson (Encoding, FromJSON, ToJSON (..), defaultOptions, genericToEncoding)
 import Data.Map.Strict qualified as Map
-import Text.Pretty.Simple (pShowNoColor)
 
 -- TODO: Add versioning before this becomes publicly accessible. The tool should
 -- always support the current lockfile version and the immediately previous
@@ -32,7 +31,7 @@ createLockfile PlanJson{pjUnits, pjCompilerId} =
     }
  where
   unitToString :: Unit -> Maybe UnitId
-  unitToString u@Unit{uId, uType, uComps} =
+  unitToString Unit{uId, uType, uComps} =
     -- For the definition of "unit type", see: https://hackage.haskell.org/package/cabal-plan-0.7.2.3/docs/Cabal-Plan.html#t:UnitType
     -- For an explanation of package types, see: https://cabal.readthedocs.io/en/stable/nix-local-build.html#local-versus-external-packages
     case uType of
@@ -56,7 +55,7 @@ createLockfile PlanJson{pjUnits, pjCompilerId} =
       UnitTypeInplace -> Nothing
       -- Global units are the external packages stored in the global Cabal
       -- store, usually at `~/.cabal/store`.
-      UnitTypeGlobal -> trace (toString $ pShowNoColor uId <> "\n" <> pShowNoColor u) $ case Map.toList uComps of
+      UnitTypeGlobal -> case Map.toList uComps of
         -- Note that global units contain every component of every external
         -- package. Some of these components might be unused (e.g. if a package is
         -- depended on for its library component, but also contains an unused

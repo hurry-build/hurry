@@ -15,10 +15,11 @@ import Options.Applicative.Extra (execParser, helper)
 import Options.Applicative.Types (Parser, ParserInfo)
 import System.Directory (getHomeDirectory)
 import System.FilePath ((</>))
+import Text.Pretty.Simple (pPrint)
 
 import Hurry.Lockfile (Lockfile (..), createLockfile)
 
-data Subcommand = Lock | Save | Restore | Verify
+data Subcommand = Lock | Save | Restore | Verify | Doctor
 
 subcommandP :: Parser Subcommand
 subcommandP =
@@ -27,6 +28,7 @@ subcommandP =
       <> command "save" (withInfo (pure Save) "Cache dependencies specified by lockfile")
       <> command "restore" (withInfo (pure Restore) "Install dependencies from lockfile")
       <> command "verify" (withInfo (pure Verify) "Check whether lockfile needs to be updated")
+      <> command "doctor" (withInfo (pure Doctor) "Dump debugging information")
 
 argparser :: ParserInfo Subcommand
 argparser = withInfo subcommandP "A build tool for Haskell applications that's fast and easy to use."
@@ -42,6 +44,7 @@ main = do
     Save -> saveCmd
     Restore -> putStrLn "Not yet implemented"
     Verify -> putStrLn "Not yet implemented"
+    Doctor -> doctorCmd
 
 lockCmd :: IO ()
 lockCmd = do
@@ -127,3 +130,15 @@ saveCmd = do
               (port 8081)
       -- Unknown status code. Panic.
       status -> error $ "unknown response code: " <> show status
+
+doctorCmd :: IO ()
+doctorCmd = do
+  -- Load the Cabal install plan.
+  let planLocation = "dist-newstyle" </> "cache" </> "plan.json"
+  cabalPlanJSON <- eitherDecodeFileStrict @PlanJson planLocation
+  PlanJson{pjUnits} <- case cabalPlanJSON of
+    Right p -> pure p
+    Left err -> die $ "Could not load " <> show planLocation <> ": " <> err
+
+  -- Pretty-print all the units for inspection.
+  traverse_ pPrint pjUnits

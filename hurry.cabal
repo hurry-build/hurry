@@ -84,7 +84,6 @@ library
     , directory
     , filepath
     , mtl              ==2.2.2
-    , pretty-simple
     , safe-exceptions  ==0.1.7.3
     , servant          ==0.19.1
     , servant-server   ==0.19.2
@@ -105,6 +104,7 @@ executable hurry
     , filepath
     , hurry
     , optparse-applicative  ==0.17.0.0
+    , pretty-simple         ==4.1.2.0
     , req                   ==3.13.0
     , safe-exceptions       ==0.1.7.3
     , tar                   ==0.5.1.1
