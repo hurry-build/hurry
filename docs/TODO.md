@@ -1,3 +1,9 @@
+- [x] Prune unused dependencies (e.g. lib deps of unused exes) from lockfile
+- [ ] Actually save dependencies in upload handler
+- [ ] Restore cached dependencies from lockfile
+
+----
+
 - [ ] `lock` and `restore` working on just this project on one platform
   - [ ] For now, we can just store using unit IDs - I don't think we need to do anything special here
     - [ ] Do we need special `Paths_` handling?

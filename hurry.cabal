@@ -79,14 +79,15 @@ library
     Hurry.Server
 
   build-depends:
-    , aeson            ==2.1.1.0
-    , cabal-plan       ==0.7.2.3
+    , aeson             ==2.1.1.0
+    , algebraic-graphs  ==0.7
+    , cabal-plan        ==0.7.2.3
     , directory
     , filepath
-    , mtl              ==2.2.2
-    , safe-exceptions  ==0.1.7.3
-    , servant          ==0.19.1
-    , servant-server   ==0.19.2
+    , mtl               ==2.2.2
+    , safe-exceptions   ==0.1.7.3
+    , servant           ==0.19.1
+    , servant-server    ==0.19.2
 
 executable hurry
   import:         lang

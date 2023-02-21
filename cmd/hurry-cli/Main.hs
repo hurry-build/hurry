@@ -136,9 +136,9 @@ doctorCmd = do
   -- Load the Cabal install plan.
   let planLocation = "dist-newstyle" </> "cache" </> "plan.json"
   cabalPlanJSON <- eitherDecodeFileStrict @PlanJson planLocation
-  PlanJson{pjUnits} <- case cabalPlanJSON of
+  cabalPlan <- case cabalPlanJSON of
     Right p -> pure p
     Left err -> die $ "Could not load " <> show planLocation <> ": " <> err
 
   -- Pretty-print all the units for inspection.
-  traverse_ pPrint pjUnits
+  pPrint cabalPlan
