@@ -3,7 +3,7 @@ module Main (main) where
 import Relude
 
 import Cabal.Plan (PlanJson (..), UnitId (..), dispPkgId)
-import Codec.Archive.Tar qualified as Tar
+import Codec.Archive.Zip (ZipOption (..), addFilesToArchive, emptyArchive, fromArchive)
 import Codec.Compression.Zstd qualified as Zstd
 import Data.Aeson (decodeFileStrict', eitherDecodeFileStrict)
 import Data.Aeson.Encode.Pretty (encodePretty)
@@ -13,10 +13,10 @@ import Network.HTTP.Req (HEAD (..), NoReqBody (NoReqBody), PUT (..), ReqBodyBs (
 import Options.Applicative.Builder (command, fullDesc, info, progDesc, subparser)
 import Options.Applicative.Extra (execParser, helper)
 import Options.Applicative.Types (Parser, ParserInfo)
+import System.Directory (getHomeDirectory)
 import System.FilePath ((</>))
 
 import Hurry.Lockfile (Lockfile (..), createLockfile)
-import System.Directory (getHomeDirectory)
 
 data Subcommand = Lock | Save | Restore | Verify
 
@@ -111,8 +111,8 @@ saveCmd = do
         !payload <-
           Zstd.compress zstdCompressionLevel
             . toStrict
-            . Tar.write
-            <$> Tar.pack storePath [toString unitId]
+            . fromArchive
+            <$> addFilesToArchive [OptRecursive] emptyArchive [storePath </> toString unitId]
 
         putStrLn $ "Uploading unit to cache (size " <> show (BS.length payload) <> ")"
 

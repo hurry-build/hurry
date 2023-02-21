@@ -2,9 +2,10 @@ module Hurry.Lockfile (Lockfile (..), createLockfile) where
 
 import Relude
 
-import Cabal.Plan (PkgId, PlanJson (..), Unit (..), UnitId (..), UnitType (..))
+import Cabal.Plan (CompName (CompNameExe), PkgId, PlanJson (..), Unit (..), UnitId (..), UnitType (..))
 import Data.Aeson (Encoding, FromJSON, ToJSON (..), defaultOptions, genericToEncoding)
 import Data.Map.Strict qualified as Map
+import Text.Pretty.Simple (pShowNoColor)
 
 -- TODO: Add versioning before this becomes publicly accessible. The tool should
 -- always support the current lockfile version and the immediately previous
@@ -31,7 +32,7 @@ createLockfile PlanJson{pjUnits, pjCompilerId} =
     }
  where
   unitToString :: Unit -> Maybe UnitId
-  unitToString Unit{uId, uType} =
+  unitToString u@Unit{uId, uType, uComps} =
     -- For the definition of "unit type", see: https://hackage.haskell.org/package/cabal-plan-0.7.2.3/docs/Cabal-Plan.html#t:UnitType
     -- For an explanation of package types, see: https://cabal.readthedocs.io/en/stable/nix-local-build.html#local-versus-external-packages
     case uType of
@@ -55,12 +56,14 @@ createLockfile PlanJson{pjUnits, pjCompilerId} =
       UnitTypeInplace -> Nothing
       -- Global units are the external packages stored in the global Cabal
       -- store, usually at `~/.cabal/store`.
-      --
-      -- Note that global units contain every component of every external
-      -- package. Some of these components might be unused (e.g. if a package is
-      -- depended on for its library component, but also contains an unused
-      -- executable component that provides a command-line tool).
-      --
-      -- TODO: Only cache components that are used. Maybe this can be determined
-      -- by examining the `build-tool-depends`.
-      UnitTypeGlobal -> Just uId
+      UnitTypeGlobal -> trace (toString $ pShowNoColor uId <> "\n" <> pShowNoColor u) $ case Map.toList uComps of
+        -- Note that global units contain every component of every external
+        -- package. Some of these components might be unused (e.g. if a package is
+        -- depended on for its library component, but also contains an unused
+        -- executable component that provides a command-line tool).
+        --
+        -- TODO: Is it possible that an Exe component here is actually used and
+        -- should be cached? For example, could it be used by
+        -- `build-tool-depends`?
+        [(CompNameExe _, _)] -> Nothing
+        _ -> Just uId
