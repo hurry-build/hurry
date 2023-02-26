@@ -45,7 +45,7 @@ hurryAPI = serve (Proxy @HurryAPI) server
   handleCheckExistence unitId = do
     putStrLn "Got HEAD request"
     print unitId
-    let cachedUnitFilePath = cachePath </> (toString unitId <> ".tar.zst")
+    let cachedUnitFilePath = cachePath </> (toString unitId <> ".zip.zst")
     unitCached <- liftIO $ doesFileExist cachedUnitFilePath
     if unitCached
       then do
@@ -65,11 +65,11 @@ hurryAPI = serve (Proxy @HurryAPI) server
   handleDownload unitId = do
     putStrLn "Got GET request"
     print unitId
-    pure ""
+    readFileBS (cachePath </> toString unitId <> ".zip.zst")
 
   handleUpload :: Text -> ByteString -> Handler ()
   handleUpload unitId uploaded = do
     putStrLn "Got PUT request"
     print unitId
     print $ BS.length uploaded
-    pure ()
+    void $ writeFileBS (cachePath </> toString unitId <> ".zip.zst") uploaded

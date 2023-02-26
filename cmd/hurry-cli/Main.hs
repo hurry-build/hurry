@@ -3,17 +3,18 @@ module Main (main) where
 import Relude
 
 import Cabal.Plan (PlanJson (..), UnitId (..), dispPkgId)
-import Codec.Archive.Zip (ZipOption (..), addFilesToArchive, emptyArchive, fromArchive)
+import Codec.Archive.Zip (ZipOption (..), addFilesToArchive, emptyArchive, extractFilesFromArchive, fromArchive, toArchive)
+import Codec.Compression.Zstd (Decompress (..))
 import Codec.Compression.Zstd qualified as Zstd
 import Data.Aeson (decodeFileStrict', eitherDecodeFileStrict)
 import Data.Aeson.Encode.Pretty (encodePretty)
 import Data.ByteString qualified as BS
 import Data.Map.Strict qualified as Map
-import Network.HTTP.Req (HEAD (..), NoReqBody (NoReqBody), PUT (..), ReqBodyBs (ReqBodyBs), defaultHttpConfig, http, httpConfigCheckResponse, ignoreResponse, port, req, responseStatusCode, runReq, (/:))
+import Network.HTTP.Req (GET (..), HEAD (..), NoReqBody (NoReqBody), PUT (..), ReqBodyBs (ReqBodyBs), bsResponse, defaultHttpConfig, http, httpConfigCheckResponse, ignoreResponse, port, req, responseBody, responseStatusCode, runReq, (/:))
 import Options.Applicative.Builder (command, fullDesc, info, progDesc, subparser)
 import Options.Applicative.Extra (execParser, helper)
 import Options.Applicative.Types (Parser, ParserInfo)
-import System.Directory (getHomeDirectory)
+import System.Directory (doesDirectoryExist, getHomeDirectory)
 import System.FilePath ((</>))
 import Text.Pretty.Simple (pPrint)
 
@@ -42,7 +43,7 @@ main = do
   case args of
     Lock -> lockCmd
     Save -> saveCmd
-    Restore -> putStrLn "Not yet implemented"
+    Restore -> restoreCmd
     Verify -> putStrLn "Not yet implemented"
     Doctor -> doctorCmd
 
@@ -82,54 +83,49 @@ saveCmd = do
   -- unit.
   --
   -- TODO: Parallelize?
-  for_ units $ \(UnitId unitId) -> do
-    putTextLn $ "Caching unit " <> unitId
+  for_ units $ \unitId -> do
+    putTextLn $ "Caching unit " <> show unitId
     -- Check if the unit has already been cached.
-    headResponse <-
-      runReq defaultHttpConfig{httpConfigCheckResponse = \_ _ _ -> Nothing} $
-        req
-          HEAD
-          (http "localhost" /: "cache" /: unitId)
-          NoReqBody
-          ignoreResponse
-          (port 8081)
-    let headStatus = responseStatusCode headResponse
-    case headStatus of
-      -- Unit has already been cached. Skip.
-      200 -> do
+    cached <- checkUnitInCache unitId
+    if cached
+      then do
+        -- Unit has already been cached. Skip.
         putStrLn "Unit has already been cached"
         pass
-      -- Unit has not yet been cached. Upload to cache.
-      404 -> do
+      else do
+        -- Unit has not yet been cached. Upload to cache.
         putStrLn "Unit has not yet been cached"
+        uploadUnitToCache storePath unitId
 
-        -- This is the zstd CLI's default compression level.
-        let
-          zstdCompressionLevel = 3
+restoreCmd :: IO ()
+restoreCmd = do
+  -- Read the lockfile.
+  lockfile <- decodeFileStrict' @Lockfile "hurry.lock"
+  Lockfile{units, compiler} <- case lockfile of
+    Just l -> pure l
+    Nothing -> die "hurry.lock not found"
+  putStrLn $ "Parsed " <> show (length units) <> " units"
 
-        -- Gather the unit's files into a single archive file and compress
-        -- them.
-        putStrLn $ "Gathering files from " <> show (storePath </> toString unitId)
+  -- Check which compiled units are missing.
+  homeDir <- getHomeDirectory
+  let storePath = homeDir </> ".cabal" </> "store" </> toString (dispPkgId compiler)
 
-        !payload <-
-          Zstd.compress zstdCompressionLevel
-            . toStrict
-            . fromArchive
-            <$> addFilesToArchive [OptRecursive] emptyArchive [storePath </> toString unitId]
-
-        putStrLn $ "Uploading unit to cache (size " <> show (BS.length payload) <> ")"
-
-        -- Upload the compressed unit archive to the cache.
-        void $
-          runReq defaultHttpConfig $
-            req
-              PUT
-              (http "localhost" /: "cache" /: unitId)
-              (ReqBodyBs payload)
-              ignoreResponse
-              (port 8081)
-      -- Unknown status code. Panic.
-      status -> error $ "unknown response code: " <> show status
+  for_ units $ \unitId -> do
+    -- Check if the unit exists.
+    --
+    -- TODO: We should probably also check whether the compiled unit folder's
+    -- contents are valid via checksum.
+    putStrLn $ "Checking whether to restore unit " <> show unitId
+    unitBuilt <- checkUnitAvailableLocally storePath unitId
+    if unitBuilt
+      then putStrLn "Unit is already built locally"
+      else do
+        -- Restore unit from cache if available.
+        putStrLn "Restoring unit from cache"
+        unitCached <- checkUnitInCache unitId
+        if unitCached
+          then downloadUnitFromCache storePath unitId >> putStrLn "Unit restored from cache"
+          else putStrLn $ "Warning: unit " <> show unitId <> " is neither available nor cached"
 
 doctorCmd :: IO ()
 doctorCmd = do
@@ -142,3 +138,70 @@ doctorCmd = do
 
   -- Pretty-print all the units for inspection.
   pPrint cabalPlan
+
+-- TODO: Create a new module for these: Hurry.Network?
+
+checkUnitAvailableLocally :: FilePath -> UnitId -> IO Bool
+checkUnitAvailableLocally storePath (UnitId unitId) = doesDirectoryExist $ storePath </> toString unitId
+
+checkUnitInCache :: UnitId -> IO Bool
+checkUnitInCache (UnitId unitId) = do
+  -- Check if the unit has already been cached.
+  response <-
+    runReq defaultHttpConfig{httpConfigCheckResponse = \_ _ _ -> Nothing} $
+      req
+        HEAD
+        (http "localhost" /: "cache" /: unitId)
+        NoReqBody
+        ignoreResponse
+        (port 8081)
+  let headStatus = responseStatusCode response
+  case headStatus of
+    -- Unit has already been cached. Skip.
+    200 -> pure True
+    -- Unit has not yet been cached. Upload to cache.
+    404 -> pure False
+    -- Unknown status code. Panic.
+    status -> error $ "unknown response code: " <> show status
+
+uploadUnitToCache :: FilePath -> UnitId -> IO ()
+uploadUnitToCache storePath (UnitId unitId) = do
+  -- Gather the unit's files into a single archive file and compress
+  -- them.
+  putStrLn $ "Gathering files from " <> show (storePath </> toString unitId)
+
+  !payload <-
+    Zstd.compress zstdCompressionLevel
+      . toStrict
+      . fromArchive
+      <$> addFilesToArchive [OptRecursive] emptyArchive [storePath </> toString unitId]
+
+  putStrLn $ "Uploading unit to cache (size " <> show (BS.length payload) <> ")"
+
+  -- Upload the compressed unit archive to the cache.
+  void $
+    runReq defaultHttpConfig $
+      req
+        PUT
+        (http "localhost" /: "cache" /: unitId)
+        (ReqBodyBs payload)
+        ignoreResponse
+        (port 8081)
+ where
+  -- This is the zstd CLI's default compression level.
+  zstdCompressionLevel = 3
+
+downloadUnitFromCache :: FilePath -> UnitId -> IO ()
+downloadUnitFromCache storePath (UnitId unitId) = do
+  response <-
+    runReq defaultHttpConfig $
+      req
+        GET
+        (http "localhost" /: "cache" /: unitId)
+        NoReqBody
+        bsResponse
+        (port 8081)
+  case Zstd.decompress $ responseBody response of
+    Decompress payload -> extractFilesFromArchive [OptDestination storePath] $ toArchive $ toLazy payload
+    Error err -> error $ "downloadUnitFromCache: " <> toText err
+    Skip -> error "downloadUnitFromCache: impossible: unit was compressed in streaming mode"
