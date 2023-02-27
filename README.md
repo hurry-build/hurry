@@ -9,10 +9,9 @@ Hurry is a build tool for Haskell applications that's fast and easy to use. It i
 <!-- Commands include:
 
 - `hurry lock` generates a `hurry.lock` lockfile based on the project's currently installed dependencies. This lock file should be committed and shared among developers to enable reproducible builds, build caching, and Docker layer caching.
+- `hurry save` uploads the project's currently built dependencies to a shared dependency cache.
 - `hurry restore` installs dependencies from the `hurry.lock` file, loading them from a shared dependency cache when available.
 - `hurry verify` checks whether the solved dependency installation plan from running `cabal build` conflicts with the project's `hurry.lock`.
-- `hurry save` uploads the project's currently built dependencies to a shared dependency cache.
-- `hurry build` does the right thing, and you can build the deps from just a lockfile (for Docker layer caching)
 
 -->
 

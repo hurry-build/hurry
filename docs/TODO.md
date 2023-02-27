@@ -1,33 +1,22 @@
-- [x] Prune unused dependencies (e.g. lib deps of unused exes) from lockfile
-- [ ] Actually save dependencies in upload handler
-- [ ] Restore cached dependencies from lockfile
+# To do
 
-----
+- [ ] Fix bug: `however the given installed package instance does not exist`
+  - Probably because we don't currently save the `.conf` package configuration file
 
-- [ ] `lock` and `restore` working on just this project on one platform
-  - [ ] For now, we can just store using unit IDs - I don't think we need to do anything special here
-    - [ ] Do we need special `Paths_` handling?
-  - [ ] Make restore _only_ work from cache to start, and then later have it do installs
-- [ ] `verify` working on one platform
-- [ ] `restore` working cross-platform
-  - [ ] Will need to parse cabal-hash in order to do cross-platform reinstall/restore (rather than just download from binary cache)
+- [ ] Compiled units are properly restored on systems with the same Cabal store path
+  - Today, we don't take Cabal store path into account.
 
-----
+- [ ] When units are relocatable, allow them to be restored even when the Cabal store path is different
+  - Will need to rewrite the `.conf` file for relocation
+  - `cabal-cache` does this by checking whether `/share` in component contains any non-relocatable data files
+    - Note that to be relocatable, all transitive dependencies must also be relocatable
+    - Is there a way we can rewrite the module instead to allow relocatability?
+    - Can we detect whether a `Paths_` module is actually used?
 
-- Later, we should have `hurry build` that implicitly runs `verify`, `lock`, `restore`, and `save` as needed and those specific actions can be moved to subcommands
+- [ ] Emit warning when lockfile is out-of-sync from current installation plan
+  - Maybe make this into a `hurry verify` subcommand?
 
-----
-
-- [ ] `cabal install hurry`
-
-- [ ] Actionable error handling
-  - When we can't parse plan.json files: "are you sure this is a cabal installation dependency install plan? If so, submit a bug report at $REPO and attach the plan.json file"
-
-- [ ] CLI analytics
-  - What GHC and cabal versions are being used? Which are well-supported? Which are erroring out?
-
-- [ ] `hurry cache`
-  - Add some sort of exclude mechanism for dependencies that aren't cacheable?
-    - Example: non-relocatable native C libraries
-
-- [ ] `hurry restore`
+- [ ] Create a cross-platform lockfile
+  - I'm not sure we can use unit IDs here, because unit IDs might vary between platforms
+  - Can we just enumerate supported platforms?
+  - Alternatively, should we lock platform-agnostic descriptions of packages? For example: name, package, flags, constraints (using cabal-hash and .conf info?)
