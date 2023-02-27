@@ -1,4 +1,4 @@
-module Hurry.Lockfile (Lockfile (..), createLockfile) where
+module Hurry.Client.Lockfile (Lockfile (..), createLockfile) where
 
 import Relude
 

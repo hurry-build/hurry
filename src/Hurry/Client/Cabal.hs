@@ -1,4 +1,4 @@
-module Hurry.Cabal (loadPackageHash) where
+module Hurry.Client.Cabal (loadPackageHash) where
 
 import Relude
 
