@@ -1,4 +1,4 @@
-module Hurry.Client.Lockfile (Lockfile (..), createLockfile) where
+module Hurry.Client.Lockfile (Lockfile (..), LockfileUnitInfo(..), createLockfile) where
 
 import Relude
 
@@ -14,7 +14,7 @@ import Data.Set qualified as Set
 -- lockfile version, and support upgrading from the immediately previous version
 -- where possible.
 data Lockfile = Lockfile
-  { units :: [UnitId]
+  { units :: Map UnitId LockfileUnitInfo
   , compiler :: PkgId
   }
   deriving stock (Generic)
@@ -22,6 +22,16 @@ data Lockfile = Lockfile
 
 instance ToJSON Lockfile where
   toEncoding :: Lockfile -> Encoding
+  toEncoding = genericToEncoding defaultOptions
+
+newtype LockfileUnitInfo = LockfileUnitInfo
+  { hasGhcPkgConf :: Bool
+  }
+  deriving stock (Generic, Eq, Ord)
+  deriving anyclass (FromJSON)
+
+instance ToJSON LockfileUnitInfo where
+  toEncoding :: LockfileUnitInfo -> Encoding
   toEncoding = genericToEncoding defaultOptions
 
 createLockfile :: PlanJson -> Lockfile
@@ -40,7 +50,7 @@ createLockfile PlanJson{pjUnits, pjCompilerId} =
       --
       -- Unit IDs are sorted so that installation plans with the same units are
       -- stable.
-      units = sort $ toList reachableLockableUnits
+      units = fromList ((\unitId -> (unitId, LockfileUnitInfo (hasGhcPkgConf unitId))) <$> toList reachableLockableUnits)
     , compiler = pjCompilerId
     }
  where
@@ -92,4 +102,17 @@ createLockfile PlanJson{pjUnits, pjCompilerId} =
       -- store, usually at `~/.cabal/store`.
       UnitTypeGlobal -> True
    where
-    Unit{uType} = fromMaybe (error "impossible: unknown unit ID") $ Map.lookup unitID pjUnits
+    Unit{uType} = lookup unitID
+
+  -- Packages that are single executable components will not have a
+  -- corresponding ghc-pkg .conf file, because they are executable binaries and
+  -- not libraries and can never be depended upon by a library.
+  hasGhcPkgConf :: UnitId -> Bool
+  hasGhcPkgConf unitID = case Map.toList uComps of
+    [(_, CompInfo{ciBinFile = Just _})] -> False
+    _ -> True
+   where
+    Unit{uComps} = lookup unitID
+
+  lookup :: UnitId -> Unit
+  lookup = fromMaybe (error "impossible: unknown unit ID") . flip Map.lookup pjUnits

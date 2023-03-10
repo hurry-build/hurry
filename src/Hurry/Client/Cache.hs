@@ -7,9 +7,10 @@ import Codec.Archive.Zip (ZipOption (..), addFilesToArchive, emptyArchive, extra
 import Codec.Compression.Zstd (Decompress (..))
 import Codec.Compression.Zstd qualified as Zstd
 import Data.ByteString qualified as BS
+import Hurry.Client.Lockfile (LockfileUnitInfo (LockfileUnitInfo, hasGhcPkgConf))
 import Network.HTTP.Req (GET (..), HEAD (..), NoReqBody (NoReqBody), PUT (..), ReqBodyBs (ReqBodyBs), bsResponse, defaultHttpConfig, http, httpConfigCheckResponse, ignoreResponse, port, req, responseBody, responseStatusCode, runReq, (/:))
 import System.Directory (doesDirectoryExist)
-import System.FilePath ((</>))
+import System.FilePath ((<.>), (</>))
 
 checkUnitAvailableLocally :: FilePath -> UnitId -> IO Bool
 checkUnitAvailableLocally storePath (UnitId unitId) = doesDirectoryExist $ storePath </> toString unitId
@@ -34,17 +35,18 @@ checkUnitInCache (UnitId unitId) = do
     -- Unknown status code. Panic.
     status -> error $ "unknown response code: " <> show status
 
-uploadUnitToCache :: FilePath -> UnitId -> IO ()
-uploadUnitToCache storePath (UnitId unitId) = do
+uploadUnitToCache :: FilePath -> UnitId -> LockfileUnitInfo -> IO ()
+uploadUnitToCache storePath (UnitId unitId) LockfileUnitInfo{hasGhcPkgConf} = do
   -- Gather the unit's files into a single archive file and compress
   -- them.
   putStrLn $ "Gathering files from " <> show (storePath </> toString unitId)
 
-  !payload <-
-    Zstd.compress zstdCompressionLevel
-      . toStrict
-      . fromArchive
-      <$> addFilesToArchive [OptRecursive] emptyArchive [storePath </> toString unitId]
+  unitFiles <- addFilesToArchive [OptRecursive] emptyArchive [storePath </> toString unitId]
+  unitAndConf <-
+    if hasGhcPkgConf
+      then addFilesToArchive [] unitFiles [storePath </> "package.db" </> toString unitId <.> "conf"]
+      else pure unitFiles
+  let !payload = Zstd.compress zstdCompressionLevel $ toStrict $ fromArchive unitAndConf
 
   putStrLn $ "Uploading unit to cache (size " <> show (BS.length payload) <> ")"
 

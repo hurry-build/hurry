@@ -79,7 +79,7 @@ saveCmd = do
   -- unit.
   --
   -- TODO: Parallelize?
-  for_ units $ \unitId -> do
+  for_ (Map.toList units) $ \(unitId, unitInfo) -> do
     putTextLn $ "Caching unit " <> show unitId
     -- Check if the unit has already been cached.
     cached <- checkUnitInCache unitId
@@ -91,7 +91,7 @@ saveCmd = do
       else do
         -- Unit has not yet been cached. Upload to cache.
         putStrLn "Unit has not yet been cached"
-        uploadUnitToCache storePath unitId
+        uploadUnitToCache storePath unitId unitInfo
 
 restoreCmd :: IO ()
 restoreCmd = do
@@ -106,7 +106,7 @@ restoreCmd = do
   homeDir <- getHomeDirectory
   let storePath = homeDir </> ".cabal" </> "store" </> toString (dispPkgId compiler)
 
-  for_ units $ \unitId -> do
+  for_ (Map.toList units) $ \(unitId, _) -> do
     -- Check if the unit exists.
     --
     -- TODO: We should probably also check whether the compiled unit folder's
