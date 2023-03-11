@@ -19,6 +19,9 @@
         "StateVar-1.2.2-5418cd17e7bc5d255ecbac856de427c7f041d9658febb445a6133a010cd0151c": {
             "hasGhcPkgConf": true
         },
+        "adjunctions-4.4.2-db1ff1376a67f54fa29ae706b5b23accf41fe9746a028048e35d8fa422061660": {
+            "hasGhcPkgConf": true
+        },
         "aeson-2.1.1.0-6faf9eb707bc087154ac74c35ec28dd268e1368ba5e961c7e252753b2a97a32f": {
             "hasGhcPkgConf": true
         },
@@ -193,6 +196,9 @@
         "file-embed-0.0.15.0-fbd801551db6842accdc0aa28e6bc9b9b84c2dbf0ea885046249ae57cc0800c7": {
             "hasGhcPkgConf": true
         },
+        "free-5.1.10-9ae15e79be0c019cfe0fc559ec7cf4e6d426c14f8bdd3526f51a28ee381b2a1d": {
+            "hasGhcPkgConf": true
+        },
         "generically-0.1-c24cdb7cf303554676440347fd30cf16aa57c78b4243da242a53037c84bd0aff": {
             "hasGhcPkgConf": true
         },
@@ -235,7 +241,19 @@
         "integer-logarithms-1.0.3.1-a991bf57ec32c5a8c3c17c7abc1529e576b79f7cfa320aa4b2f5c3fa24b86acf": {
             "hasGhcPkgConf": true
         },
+        "invariant-0.6.1-f4c3a04e74900a6e7237ba98fe338e866945f7a760b699d96eb3fc8b0b199bdd": {
+            "hasGhcPkgConf": true
+        },
         "iproute-1.7.12-e7008880a50137be615dc177374843a7451f06263d07cab8d30737afbb4de5fa": {
+            "hasGhcPkgConf": true
+        },
+        "kan-extensions-5.2.5-56677d750b20e62ab3351ea17d11ec9ef99f24117d34b31b068a9a39a07c9e80": {
+            "hasGhcPkgConf": true
+        },
+        "lens-5.2.1-99907310ad8922c1a7dad67f3dbf33b0773d33ebc40ddbce02607aa0a1526a3b": {
+            "hasGhcPkgConf": true
+        },
+        "lens-aeson-1.2.2-2743ed009c0a6a28e66df6f18e7674515a9dbbb2936a3e096923ccb7de987eb6": {
             "hasGhcPkgConf": true
         },
         "megaparsec-9.3.0-b4fec4448d434cc5f8080c73ff1d36b3926a2414e05861e0abca1c88938ceb2b": {
@@ -250,13 +268,10 @@
         "mmorph-1.2.0-6174df231f023939128c77e454eab41f92f1e65d65dc797df28d416795646ae7": {
             "hasGhcPkgConf": true
         },
-        "modern-uri-0.3.6.0-983c2987bb24cba95372d5476493c8cb88be2d793936ef90e16b6ddee8a5b409": {
+        "modern-uri-0.3.4.4-71a57673d7099fe0046f85bf68515a2f7eb9203fbb51c6c1fe0db2230e0b7215": {
             "hasGhcPkgConf": true
         },
         "monad-control-1.0.3.1-bf9b427ca029ccd04cb4ba5752643a29c6c11ddfb28ce95774e4346c7d449bcd": {
-            "hasGhcPkgConf": true
-        },
-        "mtl-compat-0.2.2-882fdda1b327dc21e63673f8e12c1be40bf59d332b039c2e74207bbfc714c4c0": {
             "hasGhcPkgConf": true
         },
         "network-3.1.2.8-52564825ea62ab1d9f4abf068ba109887b56b5b1523a06345fd7ba97b203f1ad": {
@@ -275,6 +290,9 @@
             "hasGhcPkgConf": true
         },
         "optparse-applicative-0.17.0.0-ede289bbab30eb60f9a1ab6eefefac2d9db2b1449df7d15c9592a0cf999c9779": {
+            "hasGhcPkgConf": true
+        },
+        "parallel-3.2.2.0-44e63dc5ba1c23036038987f4863753d152bbb648e54ce571ab676587af80127": {
             "hasGhcPkgConf": true
         },
         "parser-combinators-1.3.0-4e06b68ab44021fc95d1b900acc073e96ab6186e168a32c5fbab7ea814aa497d": {
@@ -310,16 +328,10 @@
         "reflection-2.1.7-e143c0fa7a3567edb8850af931e9b64b12a995cc523685fc72c5abe241518dd8": {
             "hasGhcPkgConf": true
         },
-        "relude-1.1.0.0-43409cafeb26214dc0bb450e01aee0db987fefc2d7c6c819a4df3f068ea47512": {
-            "hasGhcPkgConf": true
-        },
-        "req-3.13.0-7f1c210271d257416f0536decaaeb6caeacc75f3ca9dc62ded74b5a715d34062": {
+        "relude-1.2.0.0-d783ba5eef99377ea46e659ebc6703acf74f0ff486e80f24db46392c9f16eb9f": {
             "hasGhcPkgConf": true
         },
         "resourcet-1.2.6-bae9d46236814defa71253c871c55dba4287d64408175a603815f14f02505532": {
-            "hasGhcPkgConf": true
-        },
-        "retry-0.9.3.0-cca24ae9a99fc5f1ef7ba236cfaba39aab8d7bc6a8397494e86cec9a6b70d4d8": {
             "hasGhcPkgConf": true
         },
         "safe-exceptions-0.1.7.3-d4429c09cc5c709e73fb396f2917284e873bd4622a8f0b824869535e8f42aba7": {
@@ -332,6 +344,9 @@
             "hasGhcPkgConf": true
         },
         "semigroupoids-5.3.7-75a9155a9ad4469e141c9174971e6a3580d5874c1333915a39253007e7396812": {
+            "hasGhcPkgConf": true
+        },
+        "semigroups-0.20-62ac53465b171233a70d2fb244ee57f3fd1f17aa87cd229e7147244b331bcb14": {
             "hasGhcPkgConf": true
         },
         "servant-0.19.1-f638e7c8c897173306de04f9dbcc6f4a2a9f448c9096a5a7aa10f747a8fcaf46": {
@@ -385,6 +400,9 @@
         "time-compat-1.9.6.1-43aacd67f30e07129c6df4182415be4dddb845f1b05b1bfe6d7e69096a67c091": {
             "hasGhcPkgConf": true
         },
+        "time-locale-compat-0.1.1.5-32f70c1de243fed00f967abb9e196de9d8532966e5b34884afd434abd67bd9be": {
+            "hasGhcPkgConf": true
+        },
         "time-manager-0.0.0-de6502eaecbe36b2637ca82173db7255eb1f90f9a13dd3a9893aca1f62230527": {
             "hasGhcPkgConf": true
         },
@@ -430,6 +448,9 @@
         "vector-stream-0.1.0.0-e9255fc495dd08f4c37568cbb86089825e2b55d19c84b761ffb01036490dd871": {
             "hasGhcPkgConf": true
         },
+        "void-0.7.3-c86d27aab6814888e289a33d79f76ea2155e1ca64ada66f5c91f2adbc566e33e": {
+            "hasGhcPkgConf": true
+        },
         "wai-3.2.3-836e370bbc04ad5c3f1bed6893f0944e1a8aed82dfb9ac3b693f588bdfbded4f": {
             "hasGhcPkgConf": true
         },
@@ -452,6 +473,9 @@
             "hasGhcPkgConf": true
         },
         "word8-0.1.3-df3b098fa8a61c29f9121eab8b076388eb543b506076a064a5b0daac7a4b907d": {
+            "hasGhcPkgConf": true
+        },
+        "wreq-0.5.4.0-7f74e9023068ce9ce8229115ad7945e447f5a28af446b2832cdaf31eecfe614e": {
             "hasGhcPkgConf": true
         },
         "x509-1.7.7-37199cd799944b693fb358f043f989af3695ba0475db57f8aff622899cc0aa0e": {

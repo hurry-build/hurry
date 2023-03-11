@@ -24,7 +24,8 @@ Hurry is a build tool for Haskell applications that's fast and easy to use. It i
 Using only `cabal`, Dockerfile layer caching is very difficult. While you could run `cabal build --dependencies-only`, doing so requires `COPY`ing your `PROJECT_NAME.cabal` file. Unfortunately, Cabal files can change for many reasons (e.g. adding new modules), so the Dockerfile layer cache will often be needlessly invalidated.
 
 ```dockerfile
-COPY hurry.cabal # This will be invalidated whenever Cabal file changes (e.g. new modules)
+# This will be invalidated whenever Cabal file changes (e.g. new modules)
+COPY hurry.cabal
 RUN cabal build --dependencies-only
 COPY .
 RUN cabal build
@@ -33,10 +34,12 @@ RUN cabal build
 With Hurry, you can simply `COPY` your `hurry.lock` and then run `hurry restore` to load compiled dependencies from cache. This layer will never be invalidated unless your actual dependencies have changed, and you can check whether they've changed using `hurry verify`.
 
 ```dockerfile
-COPY hurry.lock # This only invalidates if dependencies change
+# This only invalidates if dependencies change
+COPY hurry.lock
 RUN hurry restore
 COPY .
 RUN cabal build
+RUN hurry save
 ```
 
 ## Installation
