@@ -268,7 +268,7 @@
         "mmorph-1.2.0-6174df231f023939128c77e454eab41f92f1e65d65dc797df28d416795646ae7": {
             "hasGhcPkgConf": true
         },
-        "modern-uri-0.3.4.4-71a57673d7099fe0046f85bf68515a2f7eb9203fbb51c6c1fe0db2230e0b7215": {
+        "modern-uri-0.3.6.0-983c2987bb24cba95372d5476493c8cb88be2d793936ef90e16b6ddee8a5b409": {
             "hasGhcPkgConf": true
         },
         "monad-control-1.0.3.1-bf9b427ca029ccd04cb4ba5752643a29c6c11ddfb28ce95774e4346c7d449bcd": {

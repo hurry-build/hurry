@@ -1,0 +1,8 @@
+.data
+.git
+dist-newstyle
+docs
+.env
+.gitignore
+LICENSE
+README.md

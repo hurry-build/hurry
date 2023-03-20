@@ -19,21 +19,17 @@ type HurryAPI =
     :<|> "cache" :> Capture "unitId" Text :> Get '[OctetStream] ByteString
     :<|> "cache" :> Capture "unitId" Text :> ReqBody '[OctetStream] ByteString :> Put '[JSON] ()
 
--- TODO: Make this cache path configurable.
 -- TODO: Support pluggable object storage backends.
-cachePath :: FilePath
-cachePath = "/tmp/hurry-cache"
-
-initializeServer :: IO Application
-initializeServer = do
+initializeServer :: FilePath -> IO Application
+initializeServer cachePath = do
   -- Ensure that the cache folder has been created.
   createDirectoryIfMissing True cachePath
 
   -- Provide the application.
-  pure hurryAPI
+  pure $ hurryAPI cachePath
 
-hurryAPI :: Application
-hurryAPI = serve (Proxy @HurryAPI) server
+hurryAPI :: FilePath -> Application
+hurryAPI cachePath = serve (Proxy @HurryAPI) server
  where
   server :: Server HurryAPI
   server =

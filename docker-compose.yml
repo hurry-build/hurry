@@ -1,0 +1,14 @@
+services:
+  hurry-api:
+    build:
+      context: .
+    command:
+      [
+        "/usr/local/bin/hurry-api",
+        "--hurry_port=${HURRY_PORT}",
+        "--hurry_cache_path=/var/lib/hurry/cache",
+      ]
+    ports:
+      - "${HURRY_PORT}:${HURRY_PORT}"
+    volumes:
+      - "./.data/hurry-cache:/var/lib/hurry/cache"
