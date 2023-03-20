@@ -41,6 +41,9 @@ common servant
 common servant-server
   build-depends: servant-server ==0.19.2
 
+common unix
+  build-depends: unix ==2.7.2.2
+
 common wai
   build-depends: wai ==3.2.3
 
@@ -187,6 +190,7 @@ executable hurry-api
     , aeson
     , cabal-plan
     , optparse-applicative
+    , unix
     , wai
     , wai-logger
     , warp
